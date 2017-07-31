@@ -1,8 +1,8 @@
 var VirtualModulesPlugin = require('webpack-virtual-modules');
 var RawSource = require('webpack-sources').RawSource;
-var ExtractGQL = require('persistgraphql/lib/src/ExtractGQL').ExtractGQL;
+var ExtractGQL = require('@benjie/persistgraphql/lib/src/ExtractGQL').ExtractGQL;
 var path = require('path');
-var addTypenameTransformer = require('persistgraphql/lib/src/queryTransformers').addTypenameTransformer;
+var addTypenameTransformer = require('@benjie/persistgraphql/lib/src/queryTransformers').addTypenameTransformer;
 var graphql = require('graphql');
 var _ = require('lodash');
 

@@ -1,4 +1,4 @@
-var ExtractFromJs = require("persistgraphql/lib/src/extractFromJS");
+var ExtractFromJs = require("@benjie/persistgraphql/lib/src/extractFromJS");
 
 module.exports = function(source, map) {
   this.cacheable();
