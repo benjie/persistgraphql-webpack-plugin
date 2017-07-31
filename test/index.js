@@ -66,8 +66,8 @@ describe("persistgraphql-webpack-plugin", function() {
 
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
-      assert.equal(fs.readFileSync(path.resolve('output_queries.json')).toString(),
-        '{"countUpdated { amount }":1,"query getCount {\\n  count {\\n    amount\\n  }\\n}\\n":2}');
+      assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
+        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
       done();
     });
   });
@@ -103,8 +103,8 @@ describe("persistgraphql-webpack-plugin", function() {
 
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
-      assert.equal(fs.readFileSync(path.resolve('output_queries.json')).toString(),
-        '{"countUpdated { amount }":1}');
+      assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
+        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945"});
       done();
     });
   });
@@ -162,8 +162,8 @@ describe("persistgraphql-webpack-plugin", function() {
 
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
-      assert.equal(fs.readFileSync(path.resolve('output_queries.json')).toString(),
-        '{"countUpdated { amount }":1,"query getCount {\\n  count {\\n    amount\\n  }\\n}\\n":2}');
+      assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
+        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
       done();
     });
 

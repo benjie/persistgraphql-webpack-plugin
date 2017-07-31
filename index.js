@@ -5,6 +5,11 @@ var path = require('path');
 var addTypenameTransformer = require('@benjie/persistgraphql/lib/src/queryTransformers').addTypenameTransformer;
 var graphql = require('graphql');
 var _ = require('lodash');
+var crypto = require('crypto');
+
+function hash(str) {
+  return crypto.createHash('sha1').update(str).digest('hex');
+}
 
 function PersistGraphQLPlugin(options) {
   this.options = options || {};
@@ -112,10 +117,9 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
           }
 
           var mapObj = {};
-          var id = 1;
 
           allQueries.sort().forEach(function(query) {
-            mapObj[query] = id++;
+            mapObj[query] = hash(query);
           });
 
           var newQueryMap = JSON.stringify(mapObj);
