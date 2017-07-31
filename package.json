@@ -1,6 +1,6 @@
 {
   "name": "@benjie/persistgraphql-webpack-plugin",
-  "version": "0.3.3-alpha.2",
+  "version": "0.4.0-alpha.1",
   "description": "PersistGraphQL Webpack Plugin",
   "main": "index.js",
   "scripts": {
