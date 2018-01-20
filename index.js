@@ -7,6 +7,10 @@ var graphql = require('graphql');
 var _ = require('lodash');
 var crypto = require('crypto');
 
+function normalizeGraphQLQuery(query) {
+  return graphql.print(graphql.parse(query));
+}
+
 function hash(str) {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
@@ -79,7 +83,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
             var queries = module._graphQLQueries;
             if (queries) {
               Object.keys(queries).forEach(function(query) {
-                allQueries.push(query);
+                allQueries.push(normalizeGraphQLQuery(query));
               });
             } else if (module._graphQLString) {
               graphQLString += module._graphQLString;
@@ -112,7 +116,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
             });
 
             Object.keys(queries).forEach(function(query) {
-              allQueries.push(query);
+              allQueries.push(normalizeGraphQLQuery(query));
             });
           }
 
