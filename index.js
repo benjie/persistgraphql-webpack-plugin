@@ -7,10 +7,6 @@ var graphql = require('graphql');
 var _ = require('lodash');
 var crypto = require('crypto');
 
-function normalizeGraphQLQuery(query) {
-  return graphql.print(graphql.parse(query));
-}
-
 function hash(str) {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
@@ -79,24 +75,13 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
         compilation.plugin('seal', function() {
           var graphQLString = '';
           var allQueries = [];
-          compilation.modules.forEach(function(module) {
-            var queries = module._graphQLQueries;
-            if (queries) {
-              Object.keys(queries).forEach(function(query) {
-                allQueries.push(normalizeGraphQLQuery(query));
-              });
-            } else if (module._graphQLString) {
-              graphQLString += module._graphQLString;
-            }
-          });
-
-          if (graphQLString) {
+          function processGraphQLString(stringToProcess) {
             var extractor = new ExtractGQL({inputFilePath: '',
               queryTransformers: self.options.addTypename ? [function(doc) {
               return addTypenameTransformer(JSON.parse(JSON.stringify(doc)));
             }] : undefined});
 
-            var doc = graphql.parse(graphQLString);
+            var doc = graphql.parse(stringToProcess);
             var docMap = graphql.separateOperations(doc);
             var queries = {};
             Object.keys(docMap).forEach(function (operationName) {
@@ -116,8 +101,22 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
             });
 
             Object.keys(queries).forEach(function(query) {
-              allQueries.push(normalizeGraphQLQuery(query));
+              allQueries.push(query);
             });
+          }
+          compilation.modules.forEach(function(module) {
+            var queries = module._graphQLQueries;
+            if (queries) {
+              Object.keys(queries).forEach(function(query){
+                graphQLString += query;
+              })
+            } else if (module._graphQLString) {
+              graphQLString += module._graphQLString;
+            }
+          });
+
+          if (graphQLString) {
+            processGraphQLString(graphQLString);
           }
 
           var mapObj = {};
