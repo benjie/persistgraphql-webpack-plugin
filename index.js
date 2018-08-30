@@ -7,17 +7,6 @@ var graphql = require('graphql');
 var _ = require('lodash');
 var crypto = require('crypto');
 
-function withCallback(fn) {
-  return function (arg, possiblyCallback) {
-    var self = this;
-    var promise = new Promise(function(resolve, reject) {
-      var callback = possiblyCallback || function(err, res) { if (err) reject(err); else resolve(res)};
-      fn.call(self, arg, callback);
-    });
-    return possiblyCallback ? undefined : promise;
-  }
-}
-
 function hash(str) {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
@@ -57,14 +46,17 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
   self.virtualModules.apply(compiler);
   self._compiler = compiler;
 
-  compiler.plugin('compilation', function(compilation) {
+  //compiler.plugin('compilation', function(compilation) {
+  compiler.hooks.compilation.tap('skldfjldkfgjlksjdflkjsdfl', function(compilation) {
     if (!self._queryMap && !compilation.compiler.parentCompilation) {
       self.virtualModules.writeModule(self.options.moduleName, '{}');
     }
   });
 
-  compiler.plugin('normal-module-factory', function(nmf) {
-    nmf.plugin('after-resolve', withCallback(function(result, callback) {
+  //compiler.plugin('normal-module-factory', function(nmf) {
+  compiler.hooks.normalModuleFactory.tap('ksdljfgdkjghjlsdgdkjfsl', function(nmf) {
+    //nmf.plugin('after-resolve', withCallback(function(result, callback) {
+    nmf.hooks.afterResolve.tapAsync('eirughdflgjksfldgj;l', function(result, callback) {
       if (!result) {
         return callback();
       }
@@ -77,13 +69,15 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
       } else {
         return callback(null, result);
       }
-    }));
+    });
   });
 
   if (!self.options.provider) {
-    compiler.plugin('compilation', function(compilation) {
+    //compiler.plugin('compilation', function(compilation) {
+    compiler.hooks.compilation.tap('sofdhgjfdglgfis89', function(compilation) {
       if (!compilation.compiler.parentCompilation) {
-        compilation.plugin('seal', function() {
+        //compilation.plugin('seal', function() {
+        compilation.hooks.seal.tap('sdfjdpofk90jfgd', function() {
           var graphQLString = '';
           var allQueries = [];
           function processGraphQLString(stringToProcess) {
@@ -153,12 +147,12 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
     });
   }
   if (self.options.filename) {
-    compiler.plugin('after-compile', withCallback(function(compilation, callback) {
+    //compiler.plugin('after-compile', withCallback(function(compilation, callback) {
+    compiler.hooks.afterCompile.tap('skldjflskdjflksjdf', function(compilation) {
       if (!compilation.compiler.parentCompilation) {
         compilation.assets[self.options.filename] = new RawSource(self._queryMap);
       }
-      callback();
-    }));
+    });
   }
 };
 

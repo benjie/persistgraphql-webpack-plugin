@@ -10,6 +10,12 @@ var VirtualPlugin = require("webpack-virtual-modules");
 
 var moduleName = path.resolve('node_modules/persisted_queries.json');
 
+const commonConfig = {
+  output: {
+    path: path.resolve('.')
+  }
+}
+
 describe("persistgraphql-webpack-plugin", function() {
   it("should fail if moduleName not specified", function() {
     assert.throws(function() {
@@ -21,10 +27,10 @@ describe("persistgraphql-webpack-plugin", function() {
     var plugin = new Plugin({ moduleName: moduleName });
 
     assert.doesNotThrow(function() {
-      webpack({
+      webpack(Object.assign({}, commonConfig, {
         plugins: [plugin],
         entry: 'index.js'
-      });
+      }));
     });
   });
 
@@ -39,7 +45,7 @@ describe("persistgraphql-webpack-plugin", function() {
 
     var plugin = new Plugin({ moduleName: moduleName, filename: 'output_queries.json' });
 
-    var compiler = webpack({
+    var compiler = webpack(Object.assign({}, commonConfig, {
       plugins: [virtualPlugin, plugin],
       module: {
         rules: [
@@ -60,15 +66,19 @@ describe("persistgraphql-webpack-plugin", function() {
         }
       },
       entry: './entry.js'
-    });
+    }));
 
     compiler.outputFileSystem = new MemoryFileSystem();
 
     compiler.run(function() {
-      var fs = compiler.outputFileSystem;
-      assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
-        {"query countUpdated {\n  amount\n}\n":"c3808f06ccac00fa81fb0eb42ebad1ce5405cc30","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
-      done();
+      try {
+        var fs = compiler.outputFileSystem;
+        assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
+          {"query countUpdated {\n  amount\n}\n":"c3808f06ccac00fa81fb0eb42ebad1ce5405cc30","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
+        done();
+      } catch (e) {
+        done(e);
+      }
     });
   });
 
@@ -81,7 +91,7 @@ describe("persistgraphql-webpack-plugin", function() {
 
     var plugin = new Plugin({ moduleName: moduleName, filename: 'output_queries.json' });
 
-    var compiler = webpack({
+    var compiler = webpack(Object.assign({}, commonConfig, {
       plugins: [virtualPlugin, plugin],
       module: {
         rules: [
@@ -97,7 +107,7 @@ describe("persistgraphql-webpack-plugin", function() {
         }
       },
       entry: './entry.js'
-    });
+    }));
 
     compiler.outputFileSystem = new MemoryFileSystem();
 
@@ -119,7 +129,7 @@ describe("persistgraphql-webpack-plugin", function() {
     });
 
     var providerPlugin = new Plugin({ moduleName: moduleName });
-    var providerCompiler = webpack({
+    var providerCompiler = webpack(Object.assign({}, commonConfig, {
       plugins: [virtualProviderPlugin, providerPlugin],
       module: {
         rules: [
@@ -140,11 +150,11 @@ describe("persistgraphql-webpack-plugin", function() {
         }
       },
       entry: './entry.js'
-    });
+    }));
 
     providerCompiler.outputFileSystem = new MemoryFileSystem();
 
-    var compiler = webpack({
+    var compiler = webpack(Object.assign({}, commonConfig, {
       plugins: [
         new VirtualPlugin({
           'entry.js': 'require("persisted_queries.json");'
@@ -156,7 +166,7 @@ describe("persistgraphql-webpack-plugin", function() {
         })
       ],
       entry: './entry.js'
-    });
+    }));
 
     compiler.outputFileSystem = new MemoryFileSystem();
 

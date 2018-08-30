@@ -31,11 +31,11 @@
     "memory-fs": "^0.4.1",
     "mocha": "^3.2.0",
     "nyc": "^11.0.2",
-    "webpack": "^3.1.0"
+    "webpack": "4.17.1"
   },
   "dependencies": {
     "@benjie/persistgraphql": "^0.3.2-alpha.1",
-    "webpack-virtual-modules": "^0.1.7"
+    "webpack-virtual-modules": "0.1.10"
   },
   "files": [
     "*.js"
