@@ -55,13 +55,17 @@ describe("persistgraphql-webpack-plugin", function() {
           },
           {
             test: /\.graphql$/,
-            use: 'graphql-loader'
+            use: [
+              {loader: 'graphql-dummy-loader'},
+              {loader: 'graphql-loader'},
+            ]
           }
         ]
       },
       resolveLoader: {
         alias: {
           'graphql-loader': path.resolve(path.join(__dirname, '../graphql-loader.js')),
+          'graphql-dummy-loader': path.resolve(path.join(__dirname, 'graphql-dummy-loader.js')),
           'js-loader': path.resolve(path.join(__dirname, '../js-loader.js'))
         }
       },
@@ -139,13 +143,17 @@ describe("persistgraphql-webpack-plugin", function() {
           },
           {
             test: /\.graphql$/,
-            use: 'graphql-loader'
+            use: [
+              {loader: 'graphql-dummy-loader'},
+              {loader: 'graphql-loader'},
+            ]
           }
         ]
       },
       resolveLoader: {
         alias: {
           'graphql-loader': path.resolve(path.join(__dirname, '../graphql-loader.js')),
+          'graphql-dummy-loader': path.resolve(path.join(__dirname, 'graphql-dummy-loader.js')),
           'js-loader': path.resolve(path.join(__dirname, '../js-loader.js'))
         }
       },

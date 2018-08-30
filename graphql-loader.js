@@ -1,7 +1,7 @@
-module.exports = function(source /*, map*/) {
+module.exports = function(source, map) {
   this.cacheable();
 
   this._module._graphQLString = source;
 
-  this.callback(null, 'module.exports = {}');
+  this.callback(null, source, map);
 };
