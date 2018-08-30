@@ -33,7 +33,7 @@ describe("persistgraphql-webpack-plugin", function() {
       'entry.js': 'var gql = require("graphql-tag");\n' +
                   'require("./example.graphql");\n' +
                   'require("persisted_queries.json");\n' +
-                  'var query = gql`countUpdated { amount }`;',
+                  'var query = gql`query countUpdated { amount }`;',
       'example.graphql': 'query getCount { count { amount } }'
     });
 
@@ -67,7 +67,7 @@ describe("persistgraphql-webpack-plugin", function() {
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
       assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
-        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
+        {"query countUpdated {\n  amount\n}\n":"c3808f06ccac00fa81fb0eb42ebad1ce5405cc30","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
       done();
     });
   });
@@ -76,7 +76,7 @@ describe("persistgraphql-webpack-plugin", function() {
     var virtualPlugin = new VirtualPlugin({
       'entry.js': 'var gql = require("graphql-tag");\n' +
                   'require("persisted_queries.json");\n' +
-                  'var query = gql`countUpdated { amount }`;'
+                  'var query = gql`query countUpdated { amount }`;'
     });
 
     var plugin = new Plugin({ moduleName: moduleName, filename: 'output_queries.json' });
@@ -104,7 +104,7 @@ describe("persistgraphql-webpack-plugin", function() {
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
       assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
-        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945"});
+        {"query countUpdated {\n  amount\n}\n":"c3808f06ccac00fa81fb0eb42ebad1ce5405cc30"});
       done();
     });
   });
@@ -114,7 +114,7 @@ describe("persistgraphql-webpack-plugin", function() {
       'entry.js': 'var gql = require("graphql-tag");\n' +
                   'require("./example.graphql");\n' +
                   'require("persisted_queries.json");\n' +
-                  'var query = gql`countUpdated { amount }`;',
+                  'var query = gql`query countUpdated { amount }`;',
       'example.graphql': 'query getCount { count { amount } }'
     });
 
@@ -163,7 +163,7 @@ describe("persistgraphql-webpack-plugin", function() {
     compiler.run(function() {
       var fs = compiler.outputFileSystem;
       assert.deepEqual(JSON.parse(fs.readFileSync(path.resolve('output_queries.json'), 'utf8')),
-        {"countUpdated { amount }":"8a8d69dc564eb8779db2a12f715904ee3ecc4945","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
+        {"query countUpdated {\n  amount\n}\n":"c3808f06ccac00fa81fb0eb42ebad1ce5405cc30","query getCount {\n  count {\n    amount\n  }\n}\n":"f0b1fc6be73d03f4ca8b5cf34c1f7ae164b8ef57"});
       done();
     });
 

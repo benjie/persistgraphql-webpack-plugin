@@ -9,9 +9,10 @@ var crypto = require('crypto');
 
 function withCallback(fn) {
   return function (arg, possiblyCallback) {
-    const promise = new Promise((resolve, reject) => {
-      const callback = possiblyCallback || ((err, res) => err ? reject(err) : resolve(res));
-      fn(arg, callback);
+    var self = this;
+    var promise = new Promise(function(resolve, reject) {
+      var callback = possiblyCallback || function(err, res) { if (err) reject(err); else resolve(res)};
+      fn.call(self, arg, callback);
     });
     return possiblyCallback ? undefined : promise;
   }
