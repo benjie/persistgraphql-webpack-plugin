@@ -7,6 +7,16 @@ var graphql = require('graphql');
 var _ = require('lodash');
 var crypto = require('crypto');
 
+function withCallback(fn) {
+  return function (arg, possiblyCallback) {
+    const promise = new Promise((resolve, reject) => {
+      const callback = possiblyCallback || ((err, res) => err ? reject(err) : resolve(res));
+      fn(arg, callback);
+    });
+    return possiblyCallback ? undefined : promise;
+  }
+}
+
 function hash(str) {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
@@ -53,7 +63,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
   });
 
   compiler.plugin('normal-module-factory', function(nmf) {
-    nmf.plugin('after-resolve', function(result, callback) {
+    nmf.plugin('after-resolve', withCallback(function(result, callback) {
       if (!result) {
         return callback();
       }
@@ -66,7 +76,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
       } else {
         return callback(null, result);
       }
-    });
+    }));
   });
 
   if (!self.options.provider) {
@@ -142,12 +152,12 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
     });
   }
   if (self.options.filename) {
-    compiler.plugin('after-compile', function(compilation, callback) {
+    compiler.plugin('after-compile', withCallback(function(compilation, callback) {
       if (!compilation.compiler.parentCompilation) {
         compilation.assets[self.options.filename] = new RawSource(self._queryMap);
       }
       callback();
-    });
+    }));
   }
 };
 
