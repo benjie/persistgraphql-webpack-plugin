@@ -78,8 +78,9 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
     // Hook the compilation step
     compiler.hooks.compilation.tap('persistgraphql:compilation', function(compilation) {
       if (!compilation.compiler.parentCompilation) {
-        // When webpack seals the compilation, generate and notify everyone about the query map
-        compilation.hooks.seal.tap('persistgraphql:seal', function() {
+        // When webpack finishes reading all the modules, generate and notify everyone about the query map, and retro-actively mod our module
+        // https://github.com/webpack/webpack/blob/1495b33102e2197792c5e2558e216c47ffac32fb/lib/Compilation.js#L1134
+        compilation.hooks.finishModules.tap('persistgraphql:finishModules', function() {
           var graphQLString = '';
           var allQueries = [];
           function processGraphQLString(stringToProcess) {
@@ -139,6 +140,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
             compilation.modules.forEach(function(module) {
               if (module.resource === self.options.moduleName ||
                 module.resource === path.resolve(path.join(compiler.context, self.options.moduleName))) {
+                module.buildInfo.jsonData = mapObj;
                 module._source._value = "module.exports = " + self._queryMap + ";";
               }
             });
@@ -156,6 +158,7 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
       compiler.hooks.compilation.tap('persistgraphql:withProvider:compilation', function(compilation) {
         if (!compilation.compiler.parentCompilation) {
           // When webpack seals the compilation, generate and notify everyone about the query map
+          // XXX: does this work on seal? Should it be on finishModules like above?
           compilation.hooks.seal.tap('persistgraphql:withProvider:seal', function() {
             if (!compilation.compiler.parentCompilation) {
               compilation.assets[self.options.filename] = new RawSource(self._queryMap);
