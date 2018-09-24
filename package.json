@@ -1,6 +1,6 @@
 {
   "name": "@benjie/persistgraphql-webpack-plugin",
-  "version": "0.4.0-alpha.3",
+  "version": "0.4.0-alpha.4",
   "description": "PersistGraphQL Webpack Plugin",
   "main": "index.js",
   "scripts": {
@@ -14,11 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/sysgears/persistgraphql-webpack-plugin.git"
   },
-  "keywords": [
-    "webpack-plugin",
-    "graphql",
-    "apollo-client"
-  ],
+  "keywords": ["webpack-plugin", "graphql", "apollo-client"],
   "author": "SysGears INC",
   "license": "MIT",
   "bugs": {
@@ -37,8 +33,6 @@
     "@benjie/persistgraphql": "^0.3.2-alpha.1",
     "webpack-virtual-modules": "0.1.10"
   },
-  "files": [
-    "*.js"
-  ],
+  "files": ["*.js"],
   "greenkeeper": {}
 }
