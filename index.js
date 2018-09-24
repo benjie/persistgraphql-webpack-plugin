@@ -151,12 +151,16 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
       }
     });
   } else {
-    // self.options.provider is true, so we need to record the query map after compile is complete
+    // self.options.provider is true, so we need to record the query map as the compilation seals
     if (self.options.filename) {
-      // Finally, after compilation, write a new asset with the query map
-      compiler.hooks.afterCompile.tap('persistgraphql:afterCompile', function(compilation) {
+      compiler.hooks.compilation.tap('persistgraphql:withProvider:compilation', function(compilation) {
         if (!compilation.compiler.parentCompilation) {
-          compilation.assets[self.options.filename] = new RawSource(self._queryMap);
+          // When webpack seals the compilation, generate and notify everyone about the query map
+          compilation.hooks.seal.tap('persistgraphql:withProvider:seal', function() {
+            if (!compilation.compiler.parentCompilation) {
+              compilation.assets[self.options.filename] = new RawSource(self._queryMap);
+            }
+          });
         }
       });
     }
