@@ -28,6 +28,8 @@ PersistGraphQLPlugin.prototype._addListener = function(listener) {
 };
 
 PersistGraphQLPlugin.prototype._notify = function(queryMap) {
+  // NOTE: this is called when `this.options.provider` is set, and the provider
+  // resolves a query map.
   var self = this;
 
   if (self._queryMap !== queryMap) {
@@ -46,17 +48,17 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
   self.virtualModules.apply(compiler);
   self._compiler = compiler;
 
-  //compiler.plugin('compilation', function(compilation) {
-  compiler.hooks.compilation.tap('skldfjldkfgjlksjdflkjsdfl', function(compilation) {
+  // Initialise the persisted_queries.json file to empty object
+  compiler.hooks.compilation.tap('persistgraphql:init', function(compilation) {
     if (!self._queryMap && !compilation.compiler.parentCompilation) {
       self.virtualModules.writeModule(self.options.moduleName, '{}');
     }
   });
 
-  //compiler.plugin('normal-module-factory', function(nmf) {
-  compiler.hooks.normalModuleFactory.tap('ksdljfgdkjghjlsdgdkjfsl', function(nmf) {
-    //nmf.plugin('after-resolve', withCallback(function(result, callback) {
-    nmf.hooks.afterResolve.tapAsync('eirughdflgjksfldgj;l', function(result, callback) {
+  // Hook normal modules
+  compiler.hooks.normalModuleFactory.tap('persistgraphql:normalModuleFactory', function(nmf) {
+    // After resolve, on success, if it's for persisted_queries.json, do NOT complete the resolve until we call self._callback
+    nmf.hooks.afterResolve.tapAsync('persistgraphql:afterResolve', function(result, callback) {
       if (!result) {
         return callback();
       }
@@ -73,11 +75,11 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
   });
 
   if (!self.options.provider) {
-    //compiler.plugin('compilation', function(compilation) {
-    compiler.hooks.compilation.tap('sofdhgjfdglgfis89', function(compilation) {
+    // Hook the compilation step
+    compiler.hooks.compilation.tap('persistgraphql:compilation', function(compilation) {
       if (!compilation.compiler.parentCompilation) {
-        //compilation.plugin('seal', function() {
-        compilation.hooks.seal.tap('sdfjdpofk90jfgd', function() {
+        // When webpack seals the compilation, generate and notify everyone about the query map
+        compilation.hooks.seal.tap('persistgraphql:seal', function() {
           var graphQLString = '';
           var allQueries = [];
           function processGraphQLString(stringToProcess) {
@@ -141,18 +143,23 @@ PersistGraphQLPlugin.prototype.apply = function(compiler) {
               }
             });
           }
+          if (!compilation.compiler.parentCompilation) {
+            compilation.assets[self.options.filename] = new RawSource(self._queryMap);
+          }
           self._listeners.forEach(function(listener) { listener._notify(self._queryMap); });
         });
       }
     });
-  }
-  if (self.options.filename) {
-    //compiler.plugin('after-compile', withCallback(function(compilation, callback) {
-    compiler.hooks.afterCompile.tap('skldjflskdjflksjdf', function(compilation) {
-      if (!compilation.compiler.parentCompilation) {
-        compilation.assets[self.options.filename] = new RawSource(self._queryMap);
-      }
-    });
+  } else {
+    // self.options.provider is true, so we need to record the query map after compile is complete
+    if (self.options.filename) {
+      // Finally, after compilation, write a new asset with the query map
+      compiler.hooks.afterCompile.tap('persistgraphql:afterCompile', function(compilation) {
+        if (!compilation.compiler.parentCompilation) {
+          compilation.assets[self.options.filename] = new RawSource(self._queryMap);
+        }
+      });
+    }
   }
 };
 
